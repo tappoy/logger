@@ -6,7 +6,7 @@ This golang logging library provides these features:
 # Format
 Log is written in the LTSV format. The format is as follows:
 ```
-date:YYYY-MM-DD HH:MM:SS\tlevel:LOG_LEVEL\tlog:LOG_MESSAGE
+datetime:YYYY-MM-DD HH:MM:SS\tlevel:LOG_LEVEL\tlog:LOG_MESSAGE
 ```
 
 ## Example of log
