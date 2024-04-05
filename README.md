@@ -21,7 +21,7 @@ datetime:2024-04-05 20:37:04	level:ERROR	log:error message
 ```
 
 # Functions
-- `NewLogger(logDirPath string, logFileName string) (*Logger, error)`: Create a new logger. Log level is set to INFO by default.
+- `NewLogger(logDirPath string, logFileName string, level string) (*Logger, error)`: Create a new logger.
 - `(*Logger) Error(format string, v ...interface{})`: Log error message.
 - `(*Logger) Info(format string, v ...interface{})`: Log info message.
 - `(*Logger) Debug(format string, v ...interface{})`: Log debug message.

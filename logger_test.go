@@ -17,48 +17,57 @@ func TestMain(m *testing.M) {
 }
 
 func TestNewLogger(t *testing.T) {
-	logger, err := NewLogger(logDirPath, logFileName)
+	logger, err := NewLogger(logDirPath, logFileName, "INFO")
 	if err != nil {
 		t.Errorf("NewLogger(%s, %s) = %v", logDirPath, logFileName, err)
 	}
 	if logger == nil {
 		t.Errorf("NewLogger(%s, %s) = %v", logDirPath, logFileName, logger)
 	}
-	if logger.logLevel != "INFO" {
-		t.Errorf("NewLogger(%s, %s) = %v", logDirPath, logFileName, logger.logLevel)
+	if logger.level != "INFO" {
+		t.Errorf("NewLogger(%s, %s) = %v", logDirPath, logFileName, logger.level)
 	}
 }
 
+func TestNewLoggerWithInvalidLogLevel(t *testing.T) {
+  _, err := NewLogger(logDirPath, logFileName, "INVALID")
+  if err == nil {
+    t.Errorf("NewLogger(%s, %s) = %v", logDirPath, logFileName, err)
+  }
+  if err.Error() != "ErrInvalidLogLevel" {
+    t.Errorf("NewLogger(%s, %s) = %v", logDirPath, logFileName, err)
+  }
+}
+
 func TestSetLogLevel(t *testing.T) {
-	logger, _ := NewLogger(logDirPath, logFileName)
+	logger, _ := NewLogger(logDirPath, logFileName, "INFO")
 	logLevels := []string{"DEBUG", "INFO", "ERROR", "NONE"}
 
-	for _, logLevel := range logLevels {
-		err := logger.SetLogLevel(logLevel)
+	for _, level := range logLevels {
+		err := logger.SetLogLevel(level)
 		if err != nil {
-			t.Errorf("SetLogLevel(%s) = %v", logLevel, err)
+			t.Errorf("SetLogLevel(%s) = %v", level, err)
 		}
-		if logger.logLevel != logLevel {
-			t.Errorf("SetLogLevel(%s) = %v", logLevel, logger.logLevel)
+		if logger.level != level {
+			t.Errorf("SetLogLevel(%s) = %v", level, logger.level)
 		}
 	}
 }
 
 func TestSetLogLevelWithInvalidLogLevel(t *testing.T) {
-	logger, _ := NewLogger(logDirPath, logFileName)
-	logLevel := "INVALID"
-	err := logger.SetLogLevel(logLevel)
+	logger, _ := NewLogger(logDirPath, logFileName, "INFO")
+	level := "INVALID"
+	err := logger.SetLogLevel(level)
 	if err == nil {
-		t.Errorf("SetLogLevel(%s) = %v", logLevel, err)
+		t.Errorf("SetLogLevel(%s) = %v", level, err)
 	}
 	if err.Error() != "ErrInvalidLogLevel" {
-		t.Errorf("SetLogLevel(%s) = %v", logLevel, err)
+		t.Errorf("SetLogLevel(%s) = %v", level, err)
 	}
 }
 
 func TestDebug(t *testing.T) {
-	logger, _ := NewLogger(logDirPath, logFileName)
-	logger.SetLogLevel("DEBUG")
+	logger, _ := NewLogger(logDirPath, logFileName, "DEBUG")
 	logger.Debug("debug message")
 
 	messages, _ := os.ReadFile(filepath.Join(logDirPath, logFileName))
@@ -70,8 +79,7 @@ func TestDebug(t *testing.T) {
 }
 
 func TestInfo(t *testing.T) {
-	logger, _ := NewLogger(logDirPath, logFileName)
-	logger.SetLogLevel("INFO")
+	logger, _ := NewLogger(logDirPath, logFileName, "INFO")
 	logger.Info("info message")
 
 	messages, _ := os.ReadFile(filepath.Join(logDirPath, logFileName))
@@ -83,8 +91,7 @@ func TestInfo(t *testing.T) {
 }
 
 func TestError(t *testing.T) {
-	logger, _ := NewLogger(logDirPath, logFileName)
-	logger.SetLogLevel("ERROR")
+	logger, _ := NewLogger(logDirPath, logFileName, "ERROR")
 	logger.Error("error message")
 
 	messages, _ := os.ReadFile(filepath.Join(logDirPath, logFileName))
@@ -96,8 +103,7 @@ func TestError(t *testing.T) {
 }
 
 func TestNone(t *testing.T) {
-	logger, _ := NewLogger(logDirPath, logFileName)
-	logger.SetLogLevel("NONE")
+	logger, _ := NewLogger(logDirPath, logFileName, "NONE")
 	logger.Debug("debug message NONE")
 	logger.Info("info message NONE")
 	logger.Error("error message NONE")

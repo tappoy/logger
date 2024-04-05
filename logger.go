@@ -11,7 +11,7 @@ import (
 type Logger struct {
 	logDirPath  string
 	logFileName string
-	logLevel    string
+	level       string
 }
 
 var logLevelMap = map[string]int{
@@ -21,7 +21,12 @@ var logLevelMap = map[string]int{
 	"NONE":  3,
 }
 
-func NewLogger(logDirPath string, logFileName string) (*Logger, error) {
+func NewLogger(logDirPath string, logFileName string, level string) (*Logger, error) {
+  // check log level
+  if _, ok := logLevelMap[level]; !ok {
+    return nil, errors.New("ErrInvalidLogLevel")
+  }
+
 	// create log directory if not exists
 	if _, err := os.Stat(logDirPath); os.IsNotExist(err) {
 		err := os.MkdirAll(logDirPath, 0755)
@@ -48,15 +53,15 @@ func NewLogger(logDirPath string, logFileName string) (*Logger, error) {
 	logger := &Logger{
 		logDirPath:  logDirPath,
 		logFileName: logFileName,
-		logLevel:    "INFO",
+		level:       level,
 	}
 
 	return logger, nil
 }
 
-func (logger *Logger) SetLogLevel(logLevel string) error {
-	if _, ok := logLevelMap[logLevel]; ok {
-		logger.logLevel = logLevel
+func (logger *Logger) SetLogLevel(level string) error {
+	if _, ok := logLevelMap[level]; ok {
+		logger.level = level
 		return nil
 	}
 
@@ -66,7 +71,7 @@ func (logger *Logger) SetLogLevel(logLevel string) error {
 func (logger *Logger) log(level string, format string, args ...interface{}) {
 	// string to int log level
 	levelInt := logLevelMap[level]
-	limitInt := logLevelMap[logger.logLevel]
+	limitInt := logLevelMap[logger.level]
 
 	// filter log level
 	if levelInt < limitInt {
@@ -81,7 +86,7 @@ func (logger *Logger) log(level string, format string, args ...interface{}) {
 	}
 	defer logFile.Close()
 
-	// log header, timestamp, logLevel
+	// log header, timestamp, level
 	header := fmt.Sprintf("datetime:%s\tlevel:%s\tlog:", time.Now().Format("2006-01-02 15:04:05"), level)
 
 	// Sprintf log message
