@@ -2,10 +2,10 @@
 This golang logging library provides these features:
 - Logging to file.
 - Filtering at the log level. Log levels are as follows:
-  - DEBUG
-  - INFO
-  - ERROR
-  - NONE
+  - DEBUG: Log all messages.
+  - INFO: Log info and error messages.
+  - ERROR: Log only error messages.
+  - NONE: Do not log any messages.
 
 # Format
 Output logs in LTSV format.
