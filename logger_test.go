@@ -94,3 +94,18 @@ func TestError(t *testing.T) {
 		t.Errorf("Error() = %v", messageStr)
 	}
 }
+
+func TestNone(t *testing.T) {
+	logger, _ := NewLogger(logDirPath, logFileName)
+	logger.SetLogLevel("NONE")
+	logger.Debug("debug message NONE")
+	logger.Info("info message NONE")
+	logger.Error("error message NONE")
+
+	messages, _ := os.ReadFile(filepath.Join(logDirPath, logFileName))
+	messageStr := string(messages)
+
+	if strings.Contains(messageStr, "NONE") {
+		t.Errorf("None() = %v", messageStr)
+	}
+}
