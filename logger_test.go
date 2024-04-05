@@ -30,13 +30,13 @@ func TestNewLogger(t *testing.T) {
 }
 
 func TestNewLoggerWithInvalidLogLevel(t *testing.T) {
-  _, err := NewLogger(logDirPath, logFileName, "INVALID")
-  if err == nil {
-    t.Errorf("NewLogger(%s, %s) = %v", logDirPath, logFileName, err)
-  }
-  if err.Error() != "ErrInvalidLogLevel" {
-    t.Errorf("NewLogger(%s, %s) = %v", logDirPath, logFileName, err)
-  }
+	_, err := NewLogger(logDirPath, logFileName, "INVALID")
+	if err == nil {
+		t.Errorf("NewLogger(%s, %s) = %v", logDirPath, logFileName, err)
+	}
+	if err.Error() != "ErrInvalidLogLevel" {
+		t.Errorf("NewLogger(%s, %s) = %v", logDirPath, logFileName, err)
+	}
 }
 
 func TestSetLogLevel(t *testing.T) {

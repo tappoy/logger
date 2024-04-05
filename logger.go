@@ -22,10 +22,10 @@ var logLevelMap = map[string]int{
 }
 
 func NewLogger(logDirPath string, logFileName string, level string) (*Logger, error) {
-  // check log level
-  if _, ok := logLevelMap[level]; !ok {
-    return nil, errors.New("ErrInvalidLogLevel")
-  }
+	// check log level
+	if _, ok := logLevelMap[level]; !ok {
+		return nil, errors.New("ErrInvalidLogLevel")
+	}
 
 	// create log directory if not exists
 	if _, err := os.Stat(logDirPath); os.IsNotExist(err) {
