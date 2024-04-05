@@ -1,10 +1,14 @@
 # About
 This golang logging library provides these features:
 - Logging to file.
-- Log level filtering that contains: DEBUG, INFO, ERROR, NONE.
+- Filtering at the log level. Log levels are as follows:
+  - DEBUG
+  - INFO
+  - ERROR
+  - NONE
 
 # Format
-Log is written in the LTSV format. The format is as follows:
+Output logs in LTSV format.
 ```
 datetime:YYYY-MM-DD HH:MM:SS\tlevel:LOG_LEVEL\tlog:LOG_MESSAGE
 ```
