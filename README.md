@@ -10,7 +10,7 @@ This golang logging library provides these features:
 # Format
 Output logs in LTSV format.
 ```
-datetime:YYYY-MM-DD HH:MM:SS\tlevel:LOG_LEVEL\tlog:LOG_MESSAGE
+datetime:YYYY-MM-DD HH:MM:SS\tlevel:LOG_LEVEL\tlog:LOG_MESSAGE\n
 ```
 
 ## Example of log
