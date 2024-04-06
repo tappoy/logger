@@ -7,111 +7,88 @@ import (
 	"testing"
 )
 
-var logDirPath = "/tmp"
-var logFileName = "test.log"
+var logDirPath = "/tmp/logger_test"
 
 func TestMain(m *testing.M) {
-	os.RemoveAll(filepath.Join(logDirPath, logFileName))
+	os.RemoveAll(filepath.Join(logDirPath))
 	retCode := m.Run()
 	os.Exit(retCode)
 }
 
 func TestNewLogger(t *testing.T) {
-	logger, err := NewLogger(logDirPath, logFileName, "INFO")
+	_, err := NewLogger(logDirPath, true)
 	if err != nil {
-		t.Errorf("NewLogger(%s, %s) = %v", logDirPath, logFileName, err)
-	}
-	if logger == nil {
-		t.Errorf("NewLogger(%s, %s) = %v", logDirPath, logFileName, logger)
-	}
-	if logger.level != "INFO" {
-		t.Errorf("NewLogger(%s, %s) = %v", logDirPath, logFileName, logger.level)
-	}
-}
-
-func TestNewLoggerWithInvalidLogLevel(t *testing.T) {
-	_, err := NewLogger(logDirPath, logFileName, "INVALID")
-	if err == nil {
-		t.Errorf("NewLogger(%s, %s) = %v", logDirPath, logFileName, err)
-	}
-	if err.Error() != "ErrInvalidLogLevel" {
-		t.Errorf("NewLogger(%s, %s) = %v", logDirPath, logFileName, err)
-	}
-}
-
-func TestSetLogLevel(t *testing.T) {
-	logger, _ := NewLogger(logDirPath, logFileName, "INFO")
-	logLevels := []string{"DEBUG", "INFO", "ERROR", "NONE"}
-
-	for _, level := range logLevels {
-		err := logger.SetLogLevel(level)
-		if err != nil {
-			t.Errorf("SetLogLevel(%s) = %v", level, err)
-		}
-		if logger.level != level {
-			t.Errorf("SetLogLevel(%s) = %v", level, logger.level)
-		}
-	}
-}
-
-func TestSetLogLevelWithInvalidLogLevel(t *testing.T) {
-	logger, _ := NewLogger(logDirPath, logFileName, "INFO")
-	level := "INVALID"
-	err := logger.SetLogLevel(level)
-	if err == nil {
-		t.Errorf("SetLogLevel(%s) = %v", level, err)
-	}
-	if err.Error() != "ErrInvalidLogLevel" {
-		t.Errorf("SetLogLevel(%s) = %v", level, err)
+		t.Errorf("NewLogger(%s, true) = %v", logDirPath, err)
 	}
 }
 
 func TestDebug(t *testing.T) {
-	logger, _ := NewLogger(logDirPath, logFileName, "DEBUG")
+	logger, _ := NewLogger(logDirPath, true)
 	logger.Debug("debug message")
 
-	messages, _ := os.ReadFile(filepath.Join(logDirPath, logFileName))
+	messages, _ := os.ReadFile(filepath.Join(logDirPath, "debug.log"))
 	messageStr := string(messages)
 
-	if !strings.Contains(messageStr, "level:DEBUG\tlog:debug message") {
+	if !strings.Contains(messageStr, "log:debug message") {
 		t.Errorf("Debug() = %v", messageStr)
 	}
 }
 
 func TestInfo(t *testing.T) {
-	logger, _ := NewLogger(logDirPath, logFileName, "INFO")
+	logger, _ := NewLogger(logDirPath, true)
 	logger.Info("info message")
 
-	messages, _ := os.ReadFile(filepath.Join(logDirPath, logFileName))
+	messages, _ := os.ReadFile(filepath.Join(logDirPath, "info.log"))
 	messageStr := string(messages)
 
-	if !strings.Contains(messageStr, "level:INFO\tlog:info message") {
+	if !strings.Contains(messageStr, "log:info message") {
 		t.Errorf("Info() = %v", messageStr)
 	}
 }
 
 func TestError(t *testing.T) {
-	logger, _ := NewLogger(logDirPath, logFileName, "ERROR")
+	logger, _ := NewLogger(logDirPath, true)
 	logger.Error("error message")
 
-	messages, _ := os.ReadFile(filepath.Join(logDirPath, logFileName))
+	messages, _ := os.ReadFile(filepath.Join(logDirPath, "error.log"))
 	messageStr := string(messages)
 
-	if !strings.Contains(messageStr, "level:ERROR\tlog:error message") {
+	if !strings.Contains(messageStr, "log:error message") {
 		t.Errorf("Error() = %v", messageStr)
 	}
 }
 
-func TestNone(t *testing.T) {
-	logger, _ := NewLogger(logDirPath, logFileName, "NONE")
-	logger.Debug("debug message NONE")
-	logger.Info("info message NONE")
-	logger.Error("error message NONE")
+func TestDebugWithFalse(t *testing.T) {
+	logger, _ := NewLogger(logDirPath, false)
+	logger.Debug("debug message false")
 
-	messages, _ := os.ReadFile(filepath.Join(logDirPath, logFileName))
+	messages, _ := os.ReadFile(filepath.Join(logDirPath, "debug.log"))
 	messageStr := string(messages)
 
-	if strings.Contains(messageStr, "NONE") {
-		t.Errorf("None() = %v", messageStr)
+	if strings.Contains(messageStr, "log:debug message false") {
+		t.Errorf("Debug() = %v", messageStr)
+	}
+}
+
+func TestSetDebug(t *testing.T) {
+	logger, _ := NewLogger(logDirPath, false)
+	logger.SetDebug(true)
+	logger.Debug("debug message2")
+
+	messages, _ := os.ReadFile(filepath.Join(logDirPath, "debug.log"))
+	messageStr := string(messages)
+
+	if !strings.Contains(messageStr, "log:debug message2") {
+		t.Errorf("Debug() = %v", messageStr)
+	}
+
+	logger.SetDebug(false)
+	logger.Debug("debug message3")
+
+	messages, _ = os.ReadFile(filepath.Join(logDirPath, "debug.log"))
+	messageStr = string(messages)
+
+	if strings.Contains(messageStr, "log:debug message3") {
+		t.Errorf("Debug() = %v", messageStr)
 	}
 }
