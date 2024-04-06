@@ -1,11 +1,7 @@
 # About
 This golang logging library provides these features:
-- Logging to file.
-- Filtering at the log level. Log levels are as follows:
-  - DEBUG: Log all messages.
-  - INFO: Log info and error messages.
-  - ERROR: Log only error messages.
-  - NONE: Do not log any messages.
+- Logging to each level files (error.log, info.log, debug.log).
+- Debug output can be turned on/off.
 
 # Format
 Output logs in LTSV format.
@@ -14,21 +10,29 @@ datetime:YYYY-MM-DD HH:MM:SS\tlevel:LOG_LEVEL\tlog:LOG_MESSAGE\n
 ```
 
 ## Example of log
+error.log
 ```
-datetime:2024-04-05 20:37:04	level:DEBUG	log:debug message
-datetime:2024-04-05 20:37:04	level:INFO	log:info message
-datetime:2024-04-05 20:37:04	level:ERROR	log:error message
+datetime:2024-04-05 20:37:04	log:error message
+```
+
+info.log
+```
+datetime:2024-04-05 20:37:04	log:info message
+```
+
+debug.log
+```
+datetime:2024-04-05 20:37:04	log:debug message
 ```
 
 # Functions
-- `NewLogger(logDirPath string, logFileName string, level string) (*Logger, error)`: Create a new logger.
-- `(*Logger) Error(format string, v ...interface{})`: Log error message.
-- `(*Logger) Info(format string, v ...interface{})`: Log info message.
-- `(*Logger) Debug(format string, v ...interface{})`: Log debug message.
-- `(*Logger) SetLogLevel(logLevel string) error`: Set log level.
+- `NewLogger(logDirPath string, debug bool) (*Logger, error)`: Create a new logger.
+- `(*Logger) Error(format string, v ...interface{})`: Log error message to error.log.
+- `(*Logger) Info(format string, v ...interface{})`: Log info message to info.log.
+- `(*Logger) Debug(format string, v ...interface{})`: Log debug message to debug.log.
+- `(*Logger) SetDebug(debug bool)`: Set debug mode on/off.
 
 # Errors
-- `ErrInvalidLogLevel`: Invalid log level.
 - `ErrCannotCreateLogDir`: Cannot create log directory.
 - `ErrCannotCreateLogFile`: Cannot create log file.
 - `ErrCannotWriteLogFile`: Cannot write log file.
