@@ -81,7 +81,7 @@ func (logger *Logger) log(level string, format string, args ...interface{}) {
 	defer logFile.Close()
 
 	// log header, timestamp, level
-	header := fmt.Sprintf("datetime:%s\tlog:", time.Now().Format("2006-01-02 15:04:05"))
+	header := fmt.Sprintf("datetime:%s\t%s:", time.Now().Format("2006-01-02 15:04:05"), level)
 
 	// Sprintf log message
 	message := fmt.Sprintf(format, args...)

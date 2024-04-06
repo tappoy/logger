@@ -5,24 +5,26 @@ This golang logging library provides these features:
 
 # Format
 Output logs in LTSV format.
+
+LEVEL.log
 ```
-datetime:YYYY-MM-DD HH:MM:SS\tlog:LOG_MESSAGE\n
+datetime:YYYY-MM-DD HH:MM:SS\tLEVEL:LOG_MESSAGE\n
 ```
 
 ## Example of log
 error.log
 ```
-datetime:2024-04-05 20:37:04	log:error message
+datetime:2024-04-05 20:37:04	error:message
 ```
 
 info.log
 ```
-datetime:2024-04-05 20:37:04	log:info message
+datetime:2024-04-05 20:37:04	info:message
 ```
 
 debug.log
 ```
-datetime:2024-04-05 20:37:04	log:debug message
+datetime:2024-04-05 20:37:04	debug:message
 ```
 
 # Functions

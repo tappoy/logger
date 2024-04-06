@@ -24,36 +24,36 @@ func TestNewLogger(t *testing.T) {
 
 func TestDebug(t *testing.T) {
 	logger, _ := NewLogger(logDirPath, true)
-	logger.Debug("debug message")
+	logger.Debug("message%d", 1)
 
 	messages, _ := os.ReadFile(filepath.Join(logDirPath, "debug.log"))
 	messageStr := string(messages)
 
-	if !strings.Contains(messageStr, "log:debug message") {
+	if !strings.Contains(messageStr, "debug:message1") {
 		t.Errorf("Debug() = %v", messageStr)
 	}
 }
 
 func TestInfo(t *testing.T) {
 	logger, _ := NewLogger(logDirPath, true)
-	logger.Info("info message")
+	logger.Info("message")
 
 	messages, _ := os.ReadFile(filepath.Join(logDirPath, "info.log"))
 	messageStr := string(messages)
 
-	if !strings.Contains(messageStr, "log:info message") {
+	if !strings.Contains(messageStr, "info:message") {
 		t.Errorf("Info() = %v", messageStr)
 	}
 }
 
 func TestError(t *testing.T) {
 	logger, _ := NewLogger(logDirPath, true)
-	logger.Error("error message")
+	logger.Error("message")
 
 	messages, _ := os.ReadFile(filepath.Join(logDirPath, "error.log"))
 	messageStr := string(messages)
 
-	if !strings.Contains(messageStr, "log:error message") {
+	if !strings.Contains(messageStr, "error:message") {
 		t.Errorf("Error() = %v", messageStr)
 	}
 }
@@ -65,7 +65,7 @@ func TestDebugWithFalse(t *testing.T) {
 	messages, _ := os.ReadFile(filepath.Join(logDirPath, "debug.log"))
 	messageStr := string(messages)
 
-	if strings.Contains(messageStr, "log:debug message false") {
+	if strings.Contains(messageStr, "debug:debug message false") {
 		t.Errorf("Debug() = %v", messageStr)
 	}
 }
@@ -78,7 +78,7 @@ func TestSetDebug(t *testing.T) {
 	messages, _ := os.ReadFile(filepath.Join(logDirPath, "debug.log"))
 	messageStr := string(messages)
 
-	if !strings.Contains(messageStr, "log:debug message2") {
+	if !strings.Contains(messageStr, "debug:debug message2") {
 		t.Errorf("Debug() = %v", messageStr)
 	}
 
@@ -88,7 +88,7 @@ func TestSetDebug(t *testing.T) {
 	messages, _ = os.ReadFile(filepath.Join(logDirPath, "debug.log"))
 	messageStr = string(messages)
 
-	if strings.Contains(messageStr, "log:debug message3") {
+	if strings.Contains(messageStr, "debug:debug message3") {
 		t.Errorf("Debug() = %v", messageStr)
 	}
 }
