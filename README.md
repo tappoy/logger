@@ -1,6 +1,10 @@
 # About
 This golang logging library provides these features:
-- Logging to each level files (error.log, info.log, debug.log).
+- Logging to each level files. The files are below:
+  - error.log: Error messages. Must be watched by the administrator.
+  - notice.log: Messages that are not error but should be noted. Should be watched by the administrator.
+  - info.log: Normal activity messages. Not necessary to be watched but helpful for the operation.
+  - debug.log: Debug messages. For developers to debug. Should turn off in production.
 - Debug output can be turned on/off.
 
 # Format
@@ -17,6 +21,11 @@ error.log
 datetime:2024-04-05 20:37:04	error:message
 ```
 
+notice.log
+```
+datetime:2024-04-05 20:37:04	notice:message
+```
+
 info.log
 ```
 datetime:2024-04-05 20:37:04	info:message
@@ -30,6 +39,7 @@ datetime:2024-04-05 20:37:04	debug:message
 # Functions
 - `NewLogger(logDirPath string, debug bool) (*Logger, error)`: Create a new logger.
 - `(*Logger) Error(format string, v ...interface{})`: Log error message to error.log.
+- `(*Logger) Notice(format string, v ...interface{})`: Log notice message to notice.log.
 - `(*Logger) Info(format string, v ...interface{})`: Log info message to info.log.
 - `(*Logger) Debug(format string, v ...interface{})`: Log debug message to debug.log.
 - `(*Logger) SetDebug(debug bool)`: Set debug mode on/off.

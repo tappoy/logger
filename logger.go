@@ -46,6 +46,12 @@ func NewLogger(logDirPath string, debug bool) (*Logger, error) {
 		return nil, err
 	}
 
+	// create notice log file if not exists
+	err = createFileIfNotExist(logDirPath, "notice.log")
+	if err != nil {
+		return nil, err
+	}
+
 	// create info log file if not exists
 	err = createFileIfNotExist(logDirPath, "info.log")
 	if err != nil {
@@ -72,7 +78,7 @@ func (logger *Logger) SetDebug(debug bool) {
 }
 
 func (logger *Logger) log(level string, format string, args ...interface{}) {
-	// log message
+	// open log file
 	logFilePath := filepath.Join(logger.logDirPath, level+".log")
 	logFile, err := os.OpenFile(logFilePath, os.O_APPEND|os.O_WRONLY, 0666)
 	if err != nil {
@@ -88,7 +94,6 @@ func (logger *Logger) log(level string, format string, args ...interface{}) {
 
 	// write log
 	logFile.WriteString(header + message + "\n")
-
 }
 
 func (logger *Logger) Debug(format string, args ...interface{}) {
@@ -99,6 +104,10 @@ func (logger *Logger) Debug(format string, args ...interface{}) {
 
 func (logger *Logger) Info(format string, args ...interface{}) {
 	logger.log("info", format, args...)
+}
+
+func (logger *Logger) Notice(format string, args ...interface{}) {
+	logger.log("notice", format, args...)
 }
 
 func (logger *Logger) Error(format string, args ...interface{}) {
