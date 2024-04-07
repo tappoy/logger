@@ -46,6 +46,18 @@ func TestInfo(t *testing.T) {
 	}
 }
 
+func TestNotice(t *testing.T) {
+	logger, _ := NewLogger(logDirPath, true)
+	logger.Notice("message")
+
+	messages, _ := os.ReadFile(filepath.Join(logDirPath, "notice.log"))
+	messageStr := string(messages)
+
+	if !strings.Contains(messageStr, "notice:message") {
+		t.Errorf("Notice() = %v", messageStr)
+	}
+}
+
 func TestError(t *testing.T) {
 	logger, _ := NewLogger(logDirPath, true)
 	logger.Error("message")
