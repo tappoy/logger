@@ -39,24 +39,6 @@ func NewLogger(logDirPath string) (*Logger, error) {
 		}
 	}
 
-	// create error log file if not exists
-	err := createFileIfNotExist(logDirPath, "error.log")
-	if err != nil {
-		return nil, err
-	}
-
-	// create notice log file if not exists
-	err = createFileIfNotExist(logDirPath, "notice.log")
-	if err != nil {
-		return nil, err
-	}
-
-	// create info log file if not exists
-	err = createFileIfNotExist(logDirPath, "info.log")
-	if err != nil {
-		return nil, err
-	}
-
 	// create logger
 	logger := &Logger{
 		logDirPath: logDirPath,
@@ -65,9 +47,42 @@ func NewLogger(logDirPath string) (*Logger, error) {
 	return logger, nil
 }
 
-func (logger *Logger) log(level string, format string, args ...interface{}) {
-	// open log file
+func (logger *Logger) log(level string, now time.Time, format string, args ...interface{}) {
+	// create log file if not exists
+	if err := createFileIfNotExist(logger.logDirPath, level+".log"); err != nil {
+		return
+	}
+
+	// get log file info
 	logFilePath := filepath.Join(logger.logDirPath, level+".log")
+	stat, err := os.Stat(logFilePath)
+	if err != nil {
+		return
+	}
+
+	// get modified time
+	modTime := stat.ModTime()
+
+	// rotate if log file is not today's
+	if modTime.Day() != now.Day() {
+		// make rote file name
+		rotateFileName := level + "_" + modTime.Format("2006-01-02") + ".log"
+		// check if rotate file exists
+		if _, err := os.Stat(filepath.Join(logger.logDirPath, rotateFileName)); err != nil {
+			// if not exists, rename log file to rotate file
+			os.Rename(logFilePath, filepath.Join(logger.logDirPath, rotateFileName))
+
+			// Processing continues even if the rotation fails.
+			// It is more fatal to fail to keep a log.
+			// So, we don't check the error.
+
+			if err := createFileIfNotExist(logger.logDirPath, level+".log"); err != nil {
+				return
+			}
+		}
+	}
+
+	// open log file
 	logFile, err := os.OpenFile(logFilePath, os.O_APPEND|os.O_WRONLY, 0666)
 	if err != nil {
 		return
@@ -75,7 +90,7 @@ func (logger *Logger) log(level string, format string, args ...interface{}) {
 	defer logFile.Close()
 
 	// log header, timestamp, level
-	header := fmt.Sprintf("datetime:%s\t%s:", time.Now().Format("2006-01-02 15:04:05"), level)
+	header := fmt.Sprintf("datetime:%s\t%s:", now.Format("2006-01-02 15:04:05"), level)
 
 	// Sprintf log message
 	message := fmt.Sprintf(format, args...)
@@ -90,17 +105,17 @@ func (logger *Logger) Debug(format string, args ...interface{}) {
 	if _, err := os.Stat(logFilePath); os.IsNotExist(err) {
 		return
 	}
-	logger.log("debug", format, args...)
+	logger.log("debug", time.Now(), format, args...)
 }
 
 func (logger *Logger) Info(format string, args ...interface{}) {
-	logger.log("info", format, args...)
+	logger.log("info", time.Now(), format, args...)
 }
 
 func (logger *Logger) Notice(format string, args ...interface{}) {
-	logger.log("notice", format, args...)
+	logger.log("notice", time.Now(), format, args...)
 }
 
 func (logger *Logger) Error(format string, args ...interface{}) {
-	logger.log("error", format, args...)
+	logger.log("error", time.Now(), format, args...)
 }

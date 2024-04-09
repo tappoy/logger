@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 var logDirPath = "/tmp/logger_test"
@@ -99,4 +100,93 @@ func TestError(t *testing.T) {
 	if !strings.Contains(messageStr, "error:message") {
 		t.Errorf("Error() = %v", messageStr)
 	}
+}
+
+func TestRotate(t *testing.T) {
+	logger, _ := NewLogger(logDirPath)
+
+	// make test times
+	today := time.Now()
+	tommorow := today.AddDate(0, 0, 1)
+
+	// add today's last message to log file
+	logger.log("info", today, "last message")
+
+	// add tommorow's message to log file
+	logger.log("info", tommorow, "rotated")
+
+	// check if log file is rotated
+	messages, err := os.ReadFile(filepath.Join(logDirPath, "info_"+today.Format("2006-01-02")+".log"))
+	if err != nil {
+		t.Errorf("Rotate() = %v", err)
+	}
+
+	messageStr := string(messages)
+	if !strings.Contains(messageStr, "info:last message") {
+		t.Errorf("Rotate() = %v", messageStr)
+	}
+
+	// check if new log file is created
+	messages, err = os.ReadFile(filepath.Join(logDirPath, "info.log"))
+	if err != nil {
+		t.Errorf("Rotate() = %v", err)
+	}
+
+	messageStr = string(messages)
+	if !strings.Contains(messageStr, "info:rotated") {
+		t.Errorf("Rotate() = %v", messageStr)
+	}
+
+}
+
+func TestRotateFailed(t *testing.T) {
+	logger, _ := NewLogger(logDirPath)
+
+	// make test times
+	today := time.Now()
+	tommorow := today.AddDate(0, 0, 1)
+
+	// create roteated log file for it's to be failed
+	err := createFileIfNotExist(logDirPath, "rotate-railed_"+today.Format("2006-01-02")+".log")
+	if err != nil {
+		t.Errorf("Rotate() = %v", err)
+	}
+
+	// set permission to read only
+	err = os.Chmod(filepath.Join(logDirPath, "rotate-railed_"+today.Format("2006-01-02")+".log"), 0400)
+	if err != nil {
+		t.Errorf("Rotate() = %v", err)
+	}
+
+	// add today's last message to log file
+	logger.log("rotate-railed", today, "Roteate Failed1")
+
+	// add tommorow's message to log file
+	logger.log("rotate-railed", tommorow, "Roteate Failed2")
+
+	// check if log file is not rotated
+	messages, err := os.ReadFile(filepath.Join(logDirPath, "rotate-railed_"+today.Format("2006-01-02")+".log"))
+	if err != nil {
+		t.Errorf("Rotate() = %v", err)
+	}
+
+	messageStr := string(messages)
+	if strings.Contains(messageStr, "rotate-railed:last message") {
+		t.Errorf("Rotate() = %v", messageStr)
+	}
+
+	// check both messages are in the info.log
+	messages, err = os.ReadFile(filepath.Join(logDirPath, "rotate-railed.log"))
+	if err != nil {
+		t.Errorf("Rotate() = %v", err)
+	}
+
+	messageStr = string(messages)
+	if !strings.Contains(messageStr, "rotate-railed:Roteate Failed1") {
+		t.Errorf("Rotate() = %v", messageStr)
+	}
+	if !strings.Contains(messageStr, "rotate-railed:Roteate Failed2") {
+		t.Errorf("Rotate() = %v", messageStr)
+	}
+
 }
