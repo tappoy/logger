@@ -16,26 +16,57 @@ func TestMain(m *testing.M) {
 }
 
 func TestNewLogger(t *testing.T) {
-	_, err := NewLogger(logDirPath, true)
+	_, err := NewLogger(logDirPath)
 	if err != nil {
 		t.Errorf("NewLogger(%s, true) = %v", logDirPath, err)
 	}
 }
 
 func TestDebug(t *testing.T) {
-	logger, _ := NewLogger(logDirPath, true)
-	logger.Debug("message%d", 1)
+	logger, _ := NewLogger(logDirPath)
 
-	messages, _ := os.ReadFile(filepath.Join(logDirPath, "debug.log"))
-	messageStr := string(messages)
-
-	if !strings.Contains(messageStr, "debug:message1") {
-		t.Errorf("Debug() = %v", messageStr)
+	// It should not create and write to debug log file
+	{
+		logger.Debug("message%d", 1)
+		_, err := os.ReadFile(filepath.Join(logDirPath, "debug.log"))
+		if err == nil {
+			t.Errorf("Debug() = %v", err)
+		}
 	}
+
+	// It should create and write to debug log file
+	{
+		// create debug log file
+		err := createFileIfNotExist(logDirPath, "debug.log")
+		if err != nil {
+			t.Errorf("Debug() = %v", err)
+		}
+		// log error
+		logger.Debug("message%d", 2)
+		messages, _ := os.ReadFile(filepath.Join(logDirPath, "debug.log"))
+		messageStr := string(messages)
+
+		if !strings.Contains(messageStr, "debug:message2") {
+			t.Errorf("Debug() = %v", messageStr)
+		}
+	}
+
+	// remove debug log file
+	os.Remove(filepath.Join(logDirPath, "debug.log"))
+
+	// It should not create and write to debug log file
+	{
+		logger.Debug("message%d", 3)
+		_, err := os.ReadFile(filepath.Join(logDirPath, "debug.log"))
+		if err == nil {
+			t.Errorf("Debug() = %v", err)
+		}
+	}
+
 }
 
 func TestInfo(t *testing.T) {
-	logger, _ := NewLogger(logDirPath, true)
+	logger, _ := NewLogger(logDirPath)
 	logger.Info("message")
 
 	messages, _ := os.ReadFile(filepath.Join(logDirPath, "info.log"))
@@ -47,7 +78,7 @@ func TestInfo(t *testing.T) {
 }
 
 func TestNotice(t *testing.T) {
-	logger, _ := NewLogger(logDirPath, true)
+	logger, _ := NewLogger(logDirPath)
 	logger.Notice("message")
 
 	messages, _ := os.ReadFile(filepath.Join(logDirPath, "notice.log"))
@@ -59,7 +90,7 @@ func TestNotice(t *testing.T) {
 }
 
 func TestError(t *testing.T) {
-	logger, _ := NewLogger(logDirPath, true)
+	logger, _ := NewLogger(logDirPath)
 	logger.Error("message")
 
 	messages, _ := os.ReadFile(filepath.Join(logDirPath, "error.log"))
@@ -67,40 +98,5 @@ func TestError(t *testing.T) {
 
 	if !strings.Contains(messageStr, "error:message") {
 		t.Errorf("Error() = %v", messageStr)
-	}
-}
-
-func TestDebugWithFalse(t *testing.T) {
-	logger, _ := NewLogger(logDirPath, false)
-	logger.Debug("debug message false")
-
-	messages, _ := os.ReadFile(filepath.Join(logDirPath, "debug.log"))
-	messageStr := string(messages)
-
-	if strings.Contains(messageStr, "debug:debug message false") {
-		t.Errorf("Debug() = %v", messageStr)
-	}
-}
-
-func TestSetDebug(t *testing.T) {
-	logger, _ := NewLogger(logDirPath, false)
-	logger.SetDebug(true)
-	logger.Debug("debug message2")
-
-	messages, _ := os.ReadFile(filepath.Join(logDirPath, "debug.log"))
-	messageStr := string(messages)
-
-	if !strings.Contains(messageStr, "debug:debug message2") {
-		t.Errorf("Debug() = %v", messageStr)
-	}
-
-	logger.SetDebug(false)
-	logger.Debug("debug message3")
-
-	messages, _ = os.ReadFile(filepath.Join(logDirPath, "debug.log"))
-	messageStr = string(messages)
-
-	if strings.Contains(messageStr, "debug:debug message3") {
-		t.Errorf("Debug() = %v", messageStr)
 	}
 }

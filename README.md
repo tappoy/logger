@@ -5,7 +5,10 @@ This golang logging library provides these features:
   - notice.log: Messages that are not error but should be noted. Should be watched by the administrator.
   - info.log: Normal activity messages. Not necessary to be watched but helpful for the operation.
   - debug.log: Debug messages. For developers to debug. Should turn off in production.
-- Debug output can be turned on/off.
+- Debug output can be turned on if debug.log exists. if not exists, debug output is turned off.
+
+# Coming soon
+- Log rotation. The log files are rotated when date changes. ex) error.log -> error-2024-04-09.log
 
 # Format
 Output logs in LTSV format.
@@ -37,12 +40,11 @@ datetime:2024-04-05 20:37:04	debug:message
 ```
 
 # Functions
-- `NewLogger(logDirPath string, debug bool) (*Logger, error)`: Create a new logger.
+- `NewLogger(logDirPath string) (*Logger, error)`: Create a new logger.
 - `(*Logger) Error(format string, v ...interface{})`: Log error message to error.log.
 - `(*Logger) Notice(format string, v ...interface{})`: Log notice message to notice.log.
 - `(*Logger) Info(format string, v ...interface{})`: Log info message to info.log.
 - `(*Logger) Debug(format string, v ...interface{})`: Log debug message to debug.log.
-- `(*Logger) SetDebug(debug bool)`: Set debug mode on/off.
 
 # Errors
 - `ErrCannotCreateLogDir`: Cannot create log directory.

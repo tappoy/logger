@@ -10,7 +10,6 @@ import (
 
 type Logger struct {
 	logDirPath string
-	debug      bool
 }
 
 func createFileIfNotExist(dirPath string, fileName string) error {
@@ -31,7 +30,7 @@ func createFileIfNotExist(dirPath string, fileName string) error {
 	return nil
 }
 
-func NewLogger(logDirPath string, debug bool) (*Logger, error) {
+func NewLogger(logDirPath string) (*Logger, error) {
 	// create log directory if not exists
 	if _, err := os.Stat(logDirPath); os.IsNotExist(err) {
 		err := os.MkdirAll(logDirPath, 0755)
@@ -58,23 +57,12 @@ func NewLogger(logDirPath string, debug bool) (*Logger, error) {
 		return nil, err
 	}
 
-	// create debug log file if not exists
-	err = createFileIfNotExist(logDirPath, "debug.log")
-	if err != nil {
-		return nil, err
-	}
-
 	// create logger
 	logger := &Logger{
 		logDirPath: logDirPath,
-		debug:      debug,
 	}
 
 	return logger, nil
-}
-
-func (logger *Logger) SetDebug(debug bool) {
-	logger.debug = debug
 }
 
 func (logger *Logger) log(level string, format string, args ...interface{}) {
@@ -97,9 +85,12 @@ func (logger *Logger) log(level string, format string, args ...interface{}) {
 }
 
 func (logger *Logger) Debug(format string, args ...interface{}) {
-	if logger.debug {
-		logger.log("debug", format, args...)
+	// check if debug log file exists
+	logFilePath := filepath.Join(logger.logDirPath, "debug.log")
+	if _, err := os.Stat(logFilePath); os.IsNotExist(err) {
+		return
 	}
+	logger.log("debug", format, args...)
 }
 
 func (logger *Logger) Info(format string, args ...interface{}) {
