@@ -6,9 +6,7 @@ This golang logging library provides these features:
   - info.log: Normal activity messages. Not necessary to be watched but helpful for the operation.
   - debug.log: Debug messages. For developers to debug. Should turn off in production.
 - Debug output can be turned on if debug.log exists. if not exists, debug output is turned off.
-
-# Coming soon
-- Log rotation. The log files are rotated when date changes. ex) error.log -> error-2024-04-09.log
+- Log rotation. The log files are rotated when date changes. `ex) error.log -> error_2024-04-09.log`
 
 # Format
 Output logs in LTSV format.
