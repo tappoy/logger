@@ -50,7 +50,7 @@ datetime:2024-04-05 20:37:04	debug:message
 - `ErrCannotWriteLogFile`: Cannot write log file.
 
 # LICENSE
-This module is licensed under the LGPL-3.0 license. For more information, see the LICENSE file.
+[LGPL-3.0](LICENSE)
 
 # AUTHOR
 [tappoy](https://github.com/tappoy)
