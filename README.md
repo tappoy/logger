@@ -49,8 +49,8 @@ datetime:2024-04-05 20:37:04	debug:message
 - `ErrCannotCreateLogFile`: Cannot create log file.
 - `ErrCannotWriteLogFile`: Cannot write log file.
 
-# LICENSE
+# License
 [LGPL-3.0](LICENSE)
 
-# AUTHOR
+# Author
 [tappoy](https://github.com/tappoy)
