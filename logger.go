@@ -12,19 +12,26 @@ type Logger struct {
 	logDir string
 }
 
+// Errors
+var (
+  ErrCannotCreateLogDir = errors.New("ErrCannotCreateLogDir")
+  ErrCannotCreateLogFile = errors.New("ErrCannotCreateLogFile")
+  ErrCannotWriteLogFile = errors.New("ErrCannotWriteLogFile")
+)
+
 func createFileIfNotExist(dirPath string, fileName string) error {
 	// create log file if not exists
 	logFilePath := filepath.Join(dirPath, fileName)
 	if _, err := os.Stat(logFilePath); os.IsNotExist(err) {
 		_, err := os.Create(filepath.Join(dirPath, fileName))
 		if err != nil {
-			return errors.New("ErrCannotCreateLogFile")
+			return ErrCannotCreateLogFile
 		}
 	}
 
 	// check log file write permission
 	if _, err := os.OpenFile(logFilePath, os.O_WRONLY, 0666); err != nil {
-		return errors.New("ErrCannotWriteLogFile")
+		return ErrCannotWriteLogFile
 	}
 
 	return nil
@@ -35,7 +42,7 @@ func NewLogger(logDir string) (*Logger, error) {
 	if _, err := os.Stat(logDir); os.IsNotExist(err) {
 		err := os.MkdirAll(logDir, 0755)
 		if err != nil {
-			return nil, errors.New("ErrCannotCreateLogDir")
+			return nil, ErrCannotCreateLogDir
 		}
 	}
 
