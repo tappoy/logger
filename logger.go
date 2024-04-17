@@ -9,7 +9,7 @@ import (
 )
 
 type Logger struct {
-	logDirPath string
+	logDir string
 }
 
 func createFileIfNotExist(dirPath string, fileName string) error {
@@ -30,10 +30,10 @@ func createFileIfNotExist(dirPath string, fileName string) error {
 	return nil
 }
 
-func NewLogger(logDirPath string) (*Logger, error) {
+func NewLogger(logDir string) (*Logger, error) {
 	// create log directory if not exists
-	if _, err := os.Stat(logDirPath); os.IsNotExist(err) {
-		err := os.MkdirAll(logDirPath, 0755)
+	if _, err := os.Stat(logDir); os.IsNotExist(err) {
+		err := os.MkdirAll(logDir, 0755)
 		if err != nil {
 			return nil, errors.New("ErrCannotCreateLogDir")
 		}
@@ -41,7 +41,7 @@ func NewLogger(logDirPath string) (*Logger, error) {
 
 	// create logger
 	logger := &Logger{
-		logDirPath: logDirPath,
+		logDir: logDir,
 	}
 
 	return logger, nil
@@ -49,12 +49,12 @@ func NewLogger(logDirPath string) (*Logger, error) {
 
 func (logger *Logger) log(level string, now time.Time, format string, args ...interface{}) {
 	// create log file if not exists
-	if err := createFileIfNotExist(logger.logDirPath, level+".log"); err != nil {
+	if err := createFileIfNotExist(logger.logDir, level+".log"); err != nil {
 		return
 	}
 
 	// get log file info
-	logFilePath := filepath.Join(logger.logDirPath, level+".log")
+	logFilePath := filepath.Join(logger.logDir, level+".log")
 	stat, err := os.Stat(logFilePath)
 	if err != nil {
 		return
@@ -68,15 +68,15 @@ func (logger *Logger) log(level string, now time.Time, format string, args ...in
 		// make rote file name
 		rotateFileName := level + "_" + modTime.Format("2006-01-02") + ".log"
 		// check if rotate file exists
-		if _, err := os.Stat(filepath.Join(logger.logDirPath, rotateFileName)); err != nil {
+		if _, err := os.Stat(filepath.Join(logger.logDir, rotateFileName)); err != nil {
 			// if not exists, rename log file to rotate file
-			os.Rename(logFilePath, filepath.Join(logger.logDirPath, rotateFileName))
+			os.Rename(logFilePath, filepath.Join(logger.logDir, rotateFileName))
 
 			// Processing continues even if the rotation fails.
 			// It is more fatal to fail to keep a log.
 			// So, we don't check the error.
 
-			if err := createFileIfNotExist(logger.logDirPath, level+".log"); err != nil {
+			if err := createFileIfNotExist(logger.logDir, level+".log"); err != nil {
 				return
 			}
 		}
@@ -101,7 +101,7 @@ func (logger *Logger) log(level string, now time.Time, format string, args ...in
 
 func (logger *Logger) Debug(format string, args ...interface{}) {
 	// check if debug log file exists
-	logFilePath := filepath.Join(logger.logDirPath, "debug.log")
+	logFilePath := filepath.Join(logger.logDir, "debug.log")
 	if _, err := os.Stat(logFilePath); os.IsNotExist(err) {
 		return
 	}
@@ -118,4 +118,8 @@ func (logger *Logger) Notice(format string, args ...interface{}) {
 
 func (logger *Logger) Error(format string, args ...interface{}) {
 	logger.log("error", time.Now(), format, args...)
+}
+
+func (logger *Logger) GetLogDir() string {
+  return logger.logDir
 }

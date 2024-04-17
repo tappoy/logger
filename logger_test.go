@@ -8,28 +8,28 @@ import (
 	"time"
 )
 
-var logDirPath = "/tmp/logger_test"
+var logDir = "/tmp/logger_test"
 
 func TestMain(m *testing.M) {
-	os.RemoveAll(filepath.Join(logDirPath))
+	os.RemoveAll(filepath.Join(logDir))
 	retCode := m.Run()
 	os.Exit(retCode)
 }
 
 func TestNewLogger(t *testing.T) {
-	_, err := NewLogger(logDirPath)
+	_, err := NewLogger(logDir)
 	if err != nil {
-		t.Errorf("NewLogger(%s, true) = %v", logDirPath, err)
+		t.Errorf("NewLogger(%s, true) = %v", logDir, err)
 	}
 }
 
 func TestDebug(t *testing.T) {
-	logger, _ := NewLogger(logDirPath)
+	logger, _ := NewLogger(logDir)
 
 	// It should not create and write to debug log file
 	{
 		logger.Debug("message%d", 1)
-		_, err := os.ReadFile(filepath.Join(logDirPath, "debug.log"))
+		_, err := os.ReadFile(filepath.Join(logDir, "debug.log"))
 		if err == nil {
 			t.Errorf("Debug() = %v", err)
 		}
@@ -38,13 +38,13 @@ func TestDebug(t *testing.T) {
 	// It should create and write to debug log file
 	{
 		// create debug log file
-		err := createFileIfNotExist(logDirPath, "debug.log")
+		err := createFileIfNotExist(logDir, "debug.log")
 		if err != nil {
 			t.Errorf("Debug() = %v", err)
 		}
 		// log error
 		logger.Debug("message%d", 2)
-		messages, _ := os.ReadFile(filepath.Join(logDirPath, "debug.log"))
+		messages, _ := os.ReadFile(filepath.Join(logDir, "debug.log"))
 		messageStr := string(messages)
 
 		if !strings.Contains(messageStr, "debug:message2") {
@@ -53,12 +53,12 @@ func TestDebug(t *testing.T) {
 	}
 
 	// remove debug log file
-	os.Remove(filepath.Join(logDirPath, "debug.log"))
+	os.Remove(filepath.Join(logDir, "debug.log"))
 
 	// It should not create and write to debug log file
 	{
 		logger.Debug("message%d", 3)
-		_, err := os.ReadFile(filepath.Join(logDirPath, "debug.log"))
+		_, err := os.ReadFile(filepath.Join(logDir, "debug.log"))
 		if err == nil {
 			t.Errorf("Debug() = %v", err)
 		}
@@ -67,10 +67,10 @@ func TestDebug(t *testing.T) {
 }
 
 func TestInfo(t *testing.T) {
-	logger, _ := NewLogger(logDirPath)
+	logger, _ := NewLogger(logDir)
 	logger.Info("message")
 
-	messages, _ := os.ReadFile(filepath.Join(logDirPath, "info.log"))
+	messages, _ := os.ReadFile(filepath.Join(logDir, "info.log"))
 	messageStr := string(messages)
 
 	if !strings.Contains(messageStr, "info:message") {
@@ -79,10 +79,10 @@ func TestInfo(t *testing.T) {
 }
 
 func TestNotice(t *testing.T) {
-	logger, _ := NewLogger(logDirPath)
+	logger, _ := NewLogger(logDir)
 	logger.Notice("message")
 
-	messages, _ := os.ReadFile(filepath.Join(logDirPath, "notice.log"))
+	messages, _ := os.ReadFile(filepath.Join(logDir, "notice.log"))
 	messageStr := string(messages)
 
 	if !strings.Contains(messageStr, "notice:message") {
@@ -91,10 +91,10 @@ func TestNotice(t *testing.T) {
 }
 
 func TestError(t *testing.T) {
-	logger, _ := NewLogger(logDirPath)
+	logger, _ := NewLogger(logDir)
 	logger.Error("message")
 
-	messages, _ := os.ReadFile(filepath.Join(logDirPath, "error.log"))
+	messages, _ := os.ReadFile(filepath.Join(logDir, "error.log"))
 	messageStr := string(messages)
 
 	if !strings.Contains(messageStr, "error:message") {
@@ -103,7 +103,7 @@ func TestError(t *testing.T) {
 }
 
 func TestRotate(t *testing.T) {
-	logger, _ := NewLogger(logDirPath)
+	logger, _ := NewLogger(logDir)
 
 	// make test times
 	today := time.Now()
@@ -116,7 +116,7 @@ func TestRotate(t *testing.T) {
 	logger.log("info", tommorow, "rotated")
 
 	// check if log file is rotated
-	messages, err := os.ReadFile(filepath.Join(logDirPath, "info_"+today.Format("2006-01-02")+".log"))
+	messages, err := os.ReadFile(filepath.Join(logDir, "info_"+today.Format("2006-01-02")+".log"))
 	if err != nil {
 		t.Errorf("Rotate() = %v", err)
 	}
@@ -127,7 +127,7 @@ func TestRotate(t *testing.T) {
 	}
 
 	// check if new log file is created
-	messages, err = os.ReadFile(filepath.Join(logDirPath, "info.log"))
+	messages, err = os.ReadFile(filepath.Join(logDir, "info.log"))
 	if err != nil {
 		t.Errorf("Rotate() = %v", err)
 	}
@@ -140,20 +140,20 @@ func TestRotate(t *testing.T) {
 }
 
 func TestRotateFailed(t *testing.T) {
-	logger, _ := NewLogger(logDirPath)
+	logger, _ := NewLogger(logDir)
 
 	// make test times
 	today := time.Now()
 	tommorow := today.AddDate(0, 0, 1)
 
 	// create roteated log file for it's to be failed
-	err := createFileIfNotExist(logDirPath, "rotate-railed_"+today.Format("2006-01-02")+".log")
+	err := createFileIfNotExist(logDir, "rotate-railed_"+today.Format("2006-01-02")+".log")
 	if err != nil {
 		t.Errorf("Rotate() = %v", err)
 	}
 
 	// set permission to read only
-	err = os.Chmod(filepath.Join(logDirPath, "rotate-railed_"+today.Format("2006-01-02")+".log"), 0400)
+	err = os.Chmod(filepath.Join(logDir, "rotate-railed_"+today.Format("2006-01-02")+".log"), 0400)
 	if err != nil {
 		t.Errorf("Rotate() = %v", err)
 	}
@@ -165,7 +165,7 @@ func TestRotateFailed(t *testing.T) {
 	logger.log("rotate-railed", tommorow, "Roteate Failed2")
 
 	// check if log file is not rotated
-	messages, err := os.ReadFile(filepath.Join(logDirPath, "rotate-railed_"+today.Format("2006-01-02")+".log"))
+	messages, err := os.ReadFile(filepath.Join(logDir, "rotate-railed_"+today.Format("2006-01-02")+".log"))
 	if err != nil {
 		t.Errorf("Rotate() = %v", err)
 	}
@@ -176,7 +176,7 @@ func TestRotateFailed(t *testing.T) {
 	}
 
 	// check both messages are in the info.log
-	messages, err = os.ReadFile(filepath.Join(logDirPath, "rotate-railed.log"))
+	messages, err = os.ReadFile(filepath.Join(logDir, "rotate-railed.log"))
 	if err != nil {
 		t.Errorf("Rotate() = %v", err)
 	}
