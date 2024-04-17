@@ -38,11 +38,12 @@ datetime:2024-04-05 20:37:04	debug:message
 ```
 
 # Functions
-- `NewLogger(logDirPath string) (*Logger, error)`: Create a new logger.
+- `NewLogger(logDir string) (*Logger, error)`: Create a new logger.
 - `(*Logger) Error(format string, v ...interface{})`: Log error message to error.log.
 - `(*Logger) Notice(format string, v ...interface{})`: Log notice message to notice.log.
 - `(*Logger) Info(format string, v ...interface{})`: Log info message to info.log.
 - `(*Logger) Debug(format string, v ...interface{})`: Log debug message to debug.log.
+- `(*Logger) GetLogDir() string`: Get log directory path.
 
 # Errors
 - `ErrCannotCreateLogDir`: Cannot create log directory.
