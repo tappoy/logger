@@ -14,9 +14,9 @@ type Logger struct {
 
 // Errors
 var (
-  ErrCannotCreateLogDir = errors.New("ErrCannotCreateLogDir")
-  ErrCannotCreateLogFile = errors.New("ErrCannotCreateLogFile")
-  ErrCannotWriteLogFile = errors.New("ErrCannotWriteLogFile")
+	ErrCannotCreateLogDir  = errors.New("ErrCannotCreateLogDir")
+	ErrCannotCreateLogFile = errors.New("ErrCannotCreateLogFile")
+	ErrCannotWriteLogFile  = errors.New("ErrCannotWriteLogFile")
 )
 
 func createFileIfNotExist(dirPath string, fileName string) error {
@@ -40,7 +40,7 @@ func createFileIfNotExist(dirPath string, fileName string) error {
 func NewLogger(logDir string) (*Logger, error) {
 	// create log directory if not exists
 	if _, err := os.Stat(logDir); os.IsNotExist(err) {
-		err := os.MkdirAll(logDir, 0755)
+		err := os.MkdirAll(logDir, 0775)
 		if err != nil {
 			return nil, ErrCannotCreateLogDir
 		}
@@ -128,5 +128,5 @@ func (logger *Logger) Error(format string, args ...interface{}) {
 }
 
 func (logger *Logger) GetLogDir() string {
-  return logger.logDir
+	return logger.logDir
 }
