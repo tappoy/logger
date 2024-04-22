@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"testing"
 	"time"
 )
@@ -11,6 +12,7 @@ import (
 var logDir = "/tmp/logger_test"
 
 func TestMain(m *testing.M) {
+	syscall.Umask(0)
 	os.RemoveAll(filepath.Join(logDir))
 	retCode := m.Run()
 	os.Exit(retCode)
@@ -19,7 +21,20 @@ func TestMain(m *testing.M) {
 func TestNewLogger(t *testing.T) {
 	_, err := NewLogger(logDir)
 	if err != nil {
-		t.Errorf("NewLogger(%s, true) = %v", logDir, err)
+		t.Errorf("NewLogger(%s) = %v", logDir, err)
+	}
+
+	// check if log directory is created
+	s, err := os.Stat(logDir)
+	if err != nil {
+		t.Errorf("NewLogger(%s) = %v", logDir, err)
+	}
+	if !s.IsDir() {
+		t.Errorf("NewLogger(%s) = %v", logDir, s)
+	}
+	// check permission
+	if s.Mode().Perm() != 0775 {
+		t.Errorf("NewLogger(%s) permission must be 0775. got %v", logDir, s.Mode().Perm())
 	}
 }
 
