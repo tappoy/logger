@@ -211,3 +211,30 @@ func TestRotateFailed(t *testing.T) {
 	}
 
 }
+
+func TestRotateOver30Files(t *testing.T) {
+	logger, _ := NewLogger(logDir)
+
+	// rotate log directory
+	rotateLogDir := filepath.Join(logDir, "backup")
+
+	// make test times
+	today := time.Now()
+
+	// add 40 log files
+	for i := 0; i < 40; i++ {
+		psudoDate := today.AddDate(0, 0, i)
+		logger.log("info", psudoDate, "message")
+		os.Chtimes(filepath.Join(logDir, "info.log"), psudoDate, psudoDate)
+	}
+
+	// check backup directory has 30 files
+	files, err := os.ReadDir(rotateLogDir)
+	if err != nil {
+		t.Errorf("Rotate() = %v", err)
+	}
+	if len(files) != 30 {
+		t.Errorf("Rotate() = %v", files)
+	}
+
+}
