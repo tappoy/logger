@@ -1,23 +1,25 @@
 // This golang package provides these features:
 //
-// # Logging to each level files. The files are below:
+// Logging to each level files. The files are below:
 //
 //   - error.log: Error messages. Must be watched by the administrator.
 //   - notice.log: Messages that are not error but should be noted. Should be watched by the administrator.
 //   - info.log: Normal activity messages. Not necessary to be watched but helpful for the operation.
 //   - debug.log: Debug messages. For developers to debug. Should turn off in production.
 //
-// # Debug output can be turned on if debug.log exists. if not exists, debug output is turned off.
+// Debug output can be turned on if debug.log exists. if not exists, debug output is turned off.
 //
-// # Log rotation. The log files are rotated when date changes.
+// Log rotation. The log files are rotated when date changes.
 //
 //	ex) error.log -> backup/error_2024-04-09.log
 //
-// # Output logs in LTSV format.
+// If there is over 30 files in backup directory, the oldest file is deleted.
+//
+// Output logs in LTSV format.
 //
 //	datetime:YYYY-MM-DD HH:MM:SS\tLEVEL:LOG_MESSAGE\n
 //
-// ## Example
+// Output example:
 //
 //	datetime:2024-04-05 20:37:04	error:message    // error.log
 //	datetime:2024-04-05 20:37:04	notice:message   // notice.log
