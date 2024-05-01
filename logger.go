@@ -33,7 +33,6 @@ import (
 	"time"
 )
 
-// Logger struct
 type Logger struct {
 	logDir string
 }

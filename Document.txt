@@ -48,7 +48,6 @@ TYPES
 type Logger struct {
 	// Has unexported fields.
 }
-    Logger struct
 
 func NewLogger(logDir string) (*Logger, error)
     Create new logger.
