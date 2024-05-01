@@ -1,3 +1,28 @@
+// This golang package provides these features:
+//
+// # Logging to each level files. The files are below:
+//
+//   - error.log: Error messages. Must be watched by the administrator.
+//   - notice.log: Messages that are not error but should be noted. Should be watched by the administrator.
+//   - info.log: Normal activity messages. Not necessary to be watched but helpful for the operation.
+//   - debug.log: Debug messages. For developers to debug. Should turn off in production.
+//
+// # Debug output can be turned on if debug.log exists. if not exists, debug output is turned off.
+//
+// # Log rotation. The log files are rotated when date changes.
+//
+//	ex) error.log -> error_2024-04-09.log
+//
+// # Output logs in LTSV format.
+//
+//	datetime:YYYY-MM-DD HH:MM:SS\tLEVEL:LOG_MESSAGE\n
+//
+// ## Example
+//
+//	datetime:2024-04-05 20:37:04	error:message    // error.log
+//	datetime:2024-04-05 20:37:04	notice:message   // notice.log
+//	datetime:2024-04-05 20:37:04	info:message     // info.log
+//	datetime:2024-04-05 20:37:04	debug:message    // debug.log
 package logger
 
 import (
@@ -8,15 +33,20 @@ import (
 	"time"
 )
 
+// Logger struct
 type Logger struct {
 	logDir string
 }
 
-// Errors
 var (
-	ErrCannotCreateLogDir  = errors.New("ErrCannotCreateLogDir")
+	// Cannot create log directory.
+	ErrCannotCreateLogDir = errors.New("ErrCannotCreateLogDir")
+
+	// Cannot create log file.
 	ErrCannotCreateLogFile = errors.New("ErrCannotCreateLogFile")
-	ErrCannotWriteLogFile  = errors.New("ErrCannotWriteLogFile")
+
+	// Cannot write log file.
+	ErrCannotWriteLogFile = errors.New("ErrCannotWriteLogFile")
 )
 
 func createFileIfNotExist(dirPath string, fileName string) error {
@@ -37,6 +67,7 @@ func createFileIfNotExist(dirPath string, fileName string) error {
 	return nil
 }
 
+// Create new logger.
 func NewLogger(logDir string) (*Logger, error) {
 	// create log directory if not exists
 	if _, err := os.Stat(logDir); os.IsNotExist(err) {
@@ -106,6 +137,7 @@ func (logger *Logger) log(level string, now time.Time, format string, args ...in
 	logFile.WriteString(header + message + "\n")
 }
 
+// Log debug message.
 func (logger *Logger) Debug(format string, args ...interface{}) {
 	// check if debug log file exists
 	logFilePath := filepath.Join(logger.logDir, "debug.log")
@@ -115,18 +147,22 @@ func (logger *Logger) Debug(format string, args ...interface{}) {
 	logger.log("debug", time.Now(), format, args...)
 }
 
+// Log info message.
 func (logger *Logger) Info(format string, args ...interface{}) {
 	logger.log("info", time.Now(), format, args...)
 }
 
+// Log notice message.
 func (logger *Logger) Notice(format string, args ...interface{}) {
 	logger.log("notice", time.Now(), format, args...)
 }
 
+// Log error message.
 func (logger *Logger) Error(format string, args ...interface{}) {
 	logger.log("error", time.Now(), format, args...)
 }
 
+// Get log directory.
 func (logger *Logger) GetLogDir() string {
 	return logger.logDir
 }
