@@ -11,7 +11,7 @@
 //
 // # Log rotation. The log files are rotated when date changes.
 //
-//	ex) error.log -> error_2024-04-09.log
+//	ex) error.log -> backup/error_2024-04-09.log
 //
 // # Output logs in LTSV format.
 //
@@ -84,6 +84,36 @@ func NewLogger(logDir string) (*Logger, error) {
 	return logger, nil
 }
 
+// rotate log file if necessary.
+func (logger *Logger) rotate(logFilePath string, level string, now time.Time, stat os.FileInfo) error {
+	// get modified time
+	modTime := stat.ModTime()
+
+	if modTime.Day() != now.Day() {
+		// create backup directory if not exists
+		if _, err := os.Stat(filepath.Join(logger.logDir, "backup")); err != nil {
+			err := os.MkdirAll(filepath.Join(logger.logDir, "backup"), 0775)
+			if err != nil {
+				return err
+			}
+		}
+		// make rote file name
+		rotateFileName := level + "_" + modTime.Format("2006-01-02") + ".log"
+		rotateFilePath := filepath.Join(logger.logDir, "backup", rotateFileName)
+		// check if rotate file exists
+		if _, err := os.Stat(rotateFilePath); err != nil {
+			// if not exists, rename log file to rotate file
+			os.Rename(logFilePath, rotateFilePath)
+
+			if err := createFileIfNotExist(logger.logDir, level+".log"); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
 func (logger *Logger) log(level string, now time.Time, format string, args ...interface{}) {
 	// create log file if not exists
 	if err := createFileIfNotExist(logger.logDir, level+".log"); err != nil {
@@ -97,27 +127,12 @@ func (logger *Logger) log(level string, now time.Time, format string, args ...in
 		return
 	}
 
-	// get modified time
-	modTime := stat.ModTime()
-
-	// rotate if log file is not today's
-	if modTime.Day() != now.Day() {
-		// make rote file name
-		rotateFileName := level + "_" + modTime.Format("2006-01-02") + ".log"
-		// check if rotate file exists
-		if _, err := os.Stat(filepath.Join(logger.logDir, rotateFileName)); err != nil {
-			// if not exists, rename log file to rotate file
-			os.Rename(logFilePath, filepath.Join(logger.logDir, rotateFileName))
-
-			// Processing continues even if the rotation fails.
-			// It is more fatal to fail to keep a log.
-			// So, we don't check the error.
-
-			if err := createFileIfNotExist(logger.logDir, level+".log"); err != nil {
-				return
-			}
-		}
-	}
+	// rotate if log file is not today's.
+	//
+	// Processing continues even if the rotation fails.
+	// It is more fatal to fail to keep a log.
+	// So, we don't check the error.
+	logger.rotate(logFilePath, level, now, stat)
 
 	// open log file
 	logFile, err := os.OpenFile(logFilePath, os.O_APPEND|os.O_WRONLY, 0666)
