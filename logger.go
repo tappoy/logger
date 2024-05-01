@@ -97,6 +97,31 @@ func (logger *Logger) rotate(logFilePath string, level string, now time.Time, st
 				return err
 			}
 		}
+
+		// remove old backup files
+		list, err := filepath.Glob(filepath.Join(logger.logDir, "backup", "*"))
+		if err != nil {
+			return err
+		}
+
+		// check if backup files count is over 30
+		if len(list) > 30 {
+			// sort by modified time
+			for i := 0; i < len(list); i++ {
+				for j := i + 1; j < len(list); j++ {
+					stat1, _ := os.Stat(list[i])
+					stat2, _ := os.Stat(list[j])
+					if stat1.ModTime().Before(stat2.ModTime()) {
+						list[i], list[j] = list[j], list[i]
+					}
+				}
+			}
+			// remove old backup files over 30
+			for i := 29; i < len(list); i++ {
+				os.Remove(list[i])
+			}
+		}
+
 		// make rote file name
 		rotateFileName := level + "_" + modTime.Format("2006-01-02") + ".log"
 		rotateFilePath := filepath.Join(logger.logDir, "backup", rotateFileName)
