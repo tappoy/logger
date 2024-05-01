@@ -17,7 +17,7 @@ is turned off.
 
 # Log rotation. The log files are rotated when date changes.
 
-    ex) error.log -> error_2024-04-09.log
+    ex) error.log -> backup/error_2024-04-09.log
 
 # Output logs in LTSV format.
 
