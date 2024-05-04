@@ -30,6 +30,7 @@ package logger
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -75,6 +76,14 @@ func NewLogger(logDir string) (*Logger, error) {
 		err := os.MkdirAll(logDir, 0775)
 		if err != nil {
 			return nil, ErrCannotCreateLogDir
+		}
+	}
+
+	// check if logDir has write permission of owner or group
+	if _, err := os.Stat(logDir); err != nil {
+		perm, _ := ioutil.ReadDir(logDir)
+		if perm[0].Mode().Perm()&0220 == 0 {
+			return nil, ErrCannotWriteLogFile
 		}
 	}
 
