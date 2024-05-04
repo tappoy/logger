@@ -238,3 +238,18 @@ func TestRotateOver30Files(t *testing.T) {
 	}
 
 }
+
+// When no write permission to log directory
+func TestNoWritePermission(t *testing.T) {
+	// set permission to read only
+	err := os.Chmod(logDir, 0400)
+	defer os.Chmod(logDir, 0775)
+	if err != nil {
+		t.Fatal("Cant set permission to read only")
+	}
+
+	_, err = NewLogger(logDir)
+	if err == nil {
+		t.Errorf("NoWritePermission() = %v", err)
+	}
+}
