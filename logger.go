@@ -79,10 +79,10 @@ func NewLogger(logDir string) (*Logger, error) {
 	}
 
 	// create tempfile to check write permission
-	if _, err := os.CreateTemp(logDir, "tempfile"); err != nil {
+	if tempfile, err := os.CreateTemp(logDir, "tempfile"); err != nil {
 		return nil, ErrCannotWriteLogFile
 	} else {
-		os.Remove(filepath.Join(logDir, "tempfile"))
+		os.Remove(tempfile.Name())
 	}
 
 	// create logger

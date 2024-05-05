@@ -36,6 +36,13 @@ func TestNewLogger(t *testing.T) {
 	if s.Mode().Perm() != 0775 {
 		t.Errorf("NewLogger(%s) permission must be 0775. got %v", logDir, s.Mode().Perm())
 	}
+
+	// check if temp file is removed
+	// get tempfile from log directory by glob
+	tempfiles, _ := filepath.Glob(filepath.Join(logDir, "tempfile*"))
+	if len(tempfiles) != 0 {
+		t.Errorf("NewLogger(%s): tempfiles must be removed. got %v", logDir, tempfiles)
+	}
 }
 
 func TestDebug(t *testing.T) {
