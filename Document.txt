@@ -11,6 +11,8 @@ Logging to each level files. The files are below:
     for the operation.
   - debug.log: Debug messages. For developers to debug. Should turn off in
     production.
+  - logger.log: Logger's own fatal messages. Should be watched by the
+    administrator.
 
 Debug output can be turned on if debug.log exists. if not exists, debug output
 is turned off.
