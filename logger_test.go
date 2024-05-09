@@ -60,7 +60,7 @@ func TestDebug(t *testing.T) {
 	// It should create and write to debug log file
 	{
 		// create debug log file
-		err := createFileIfNotExist(logDir, "debug.log")
+		err := createFileIfNotExist(filepath.Join(logDir, "debug.log"))
 		if err != nil {
 			t.Errorf("Debug() = %v", err)
 		}
@@ -175,7 +175,7 @@ func TestRotateFailed(t *testing.T) {
 	tommorow := today.AddDate(0, 0, 1)
 
 	// create roteated log file for it's to be failed
-	err := createFileIfNotExist(rotateLogDir, "rotate-failed_"+today.Format("2006-01-02")+".log")
+	err := createFileIfNotExist(filepath.Join(rotateLogDir, "rotate-failed_"+today.Format("2006-01-02")+".log"))
 	if err != nil {
 		t.Errorf("Rotate() = %v", err)
 	}
