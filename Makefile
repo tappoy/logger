@@ -5,9 +5,9 @@ FMT=tmp/fmt
 TEST=tmp/cover
 DOC=Document.txt
 
-.PHONY: all clean cover
+.PHONY: all fmt clean cover test
 
-all: $(WORKING_DIRS) $(FMT) $(BIN) $(TEST) $(DOC)
+all: $(WORKING_DIRS) fmt $(BIN) test $(DOC)
 
 clean:
 	rm -rf $(WORKING_DIRS)
@@ -15,13 +15,13 @@ clean:
 $(WORKING_DIRS):
 	mkdir -p $(WORKING_DIRS)
 
-$(FMT): $(SRC)
-	go fmt ./... > $(FMT) 2>&1 || true
+fmt: $(SRC)
+	go fmt ./...
 
 $(BIN): $(SRC)
 	go build -o $(BIN)
 
-$(TEST): $(BIN)
+test: $(BIN)
 	go test -v -tags=mock -cover -coverprofile=$(TEST) ./...
 
 $(DOC): $(SRC)
