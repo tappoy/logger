@@ -147,10 +147,12 @@ func (logger *Logger) rotate(logFilePath string, now time.Time, level string) er
 		// check if rotate file exists
 		if _, err := os.Stat(rotateFilePath); err != nil {
 			// if not exists, rename log file to rotate file
-			os.Rename(logFilePath, rotateFilePath)
+			err = os.Rename(logFilePath, rotateFilePath)
+			if err != nil {
+				return err
+			}
 		}
 	}
-
 	return nil
 }
 

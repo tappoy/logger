@@ -185,6 +185,7 @@ func TestRotateFailed(t *testing.T) {
 	if err != nil {
 		t.Errorf("Rotate() = %v", err)
 	}
+	defer os.Chmod(rotateLogDir, 0775)
 
 	// add today's last message to log file
 	logger.log("rotate-failed", today, "Roteate Failed1")
@@ -244,6 +245,43 @@ func TestRotateOver30Files(t *testing.T) {
 		t.Errorf("Rotate() = %v", files)
 	}
 
+	// chmod to read only to backup directory
+	err = os.Chmod(rotateLogDir, 0400)
+	if err != nil {
+		t.Errorf("Rotate() = %v", err)
+	}
+	defer os.Chmod(rotateLogDir, 0775)
+
+	// check buckup directory's mode
+	s, err := os.Stat(rotateLogDir)
+	if err != nil {
+		t.Errorf("Rotate() = %v", err)
+	}
+	if s.Mode().Perm() != 0400 {
+		t.Errorf("Rotate() = %v", s.Mode().Perm())
+	}
+
+	testMessage := "This is written to info.log even if a rotate error occurs."
+
+	// add 10 more log files
+	for i := 40; i < 50; i++ {
+		psudoDate := today.AddDate(0, 0, i)
+		logger.log("info", psudoDate, testMessage)
+		os.Chtimes(filepath.Join(logDir, "info.log"), psudoDate, psudoDate)
+	}
+
+	// check logger.log is created
+	_, err = os.ReadFile(filepath.Join(logDir, "logger.log"))
+	if err != nil {
+		t.Errorf("Rotate() = %v", err)
+	} else {
+		// check if test message is written to logger.log
+		messages, _ := os.ReadFile(filepath.Join(logDir, "info.log"))
+		messageStr := string(messages)
+		if !strings.Contains(messageStr, testMessage) {
+			t.Errorf("Rotate() = %v", messageStr)
+		}
+	}
 }
 
 // When no write permission to log directory
