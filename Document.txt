@@ -54,18 +54,22 @@ type Logger struct {
 func NewLogger(logDir string) (*Logger, error)
     Create new logger.
 
-func (logger *Logger) Debug(format string, args ...interface{})
+    Errors:
+      - ErrCannotCreateLogDir
+      - ErrCannotWriteLogFile
+
+func (logger *Logger) Debug(format string, args ...any)
     Log debug message.
 
-func (logger *Logger) Error(format string, args ...interface{})
+func (logger *Logger) Error(format string, args ...any)
     Log error message.
 
 func (logger *Logger) GetLogDir() string
     Get log directory.
 
-func (logger *Logger) Info(format string, args ...interface{})
+func (logger *Logger) Info(format string, args ...any)
     Log info message.
 
-func (logger *Logger) Notice(format string, args ...interface{})
+func (logger *Logger) Notice(format string, args ...any)
     Log notice message.
 
