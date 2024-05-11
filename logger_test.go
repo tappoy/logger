@@ -128,7 +128,7 @@ func TestRotate(t *testing.T) {
 	logger, _ := NewLogger(logDir)
 
 	// rotate log directory
-	rotateLogDir := filepath.Join(logDir, "backup")
+	rotateLogDir := filepath.Join(logDir, "rotate")
 
 	// make test times
 	today := time.Now()
@@ -141,7 +141,7 @@ func TestRotate(t *testing.T) {
 	logger.log("info", tommorow, "rotated")
 
 	// check if log file is rotated
-	messages, err := os.ReadFile(filepath.Join(rotateLogDir, "info_"+today.Format("2006-01-02")+".log"))
+	messages, err := os.ReadFile(filepath.Join(rotateLogDir, today.Format("2006-01-02")+".info.log"))
 	if err != nil {
 		t.Errorf("Rotate() = %v", err)
 	}
@@ -168,20 +168,23 @@ func TestRotateFailed(t *testing.T) {
 	logger, _ := NewLogger(logDir)
 
 	// rotate log directory
-	rotateLogDir := filepath.Join(logDir, "backup")
+	rotateLogDir := filepath.Join(logDir, "rotate")
 
 	// make test times
 	today := time.Now()
 	tommorow := today.AddDate(0, 0, 1)
 
+	// rotate file name
+	rotateFile := filepath.Join(rotateLogDir, today.Format("2006-01-02")+".rotate-failed.log")
+
 	// create roteated log file for it's to be failed
-	err := createFileIfNotExist(filepath.Join(rotateLogDir, "rotate-failed_"+today.Format("2006-01-02")+".log"))
+	err := createFileIfNotExist(rotateFile)
 	if err != nil {
 		t.Errorf("Rotate() = %v", err)
 	}
 
 	// set permission to read only
-	err = os.Chmod(filepath.Join(rotateLogDir, "rotate-failed_"+today.Format("2006-01-02")+".log"), 0400)
+	err = os.Chmod(rotateFile, 0400)
 	if err != nil {
 		t.Errorf("Rotate() = %v", err)
 	}
@@ -194,7 +197,7 @@ func TestRotateFailed(t *testing.T) {
 	logger.log("rotate-failed", tommorow, "Roteate Failed2")
 
 	// check if log file is not rotated
-	messages, err := os.ReadFile(filepath.Join(rotateLogDir, "rotate-failed_"+today.Format("2006-01-02")+".log"))
+	messages, err := os.ReadFile(rotateFile)
 	if err != nil {
 		t.Errorf("Rotate() = %v", err)
 	}
@@ -224,7 +227,7 @@ func TestRotateOver30Files(t *testing.T) {
 	logger, _ := NewLogger(logDir)
 
 	// rotate log directory
-	rotateLogDir := filepath.Join(logDir, "backup")
+	rotateLogDir := filepath.Join(logDir, "rotate")
 
 	// make test times
 	today := time.Now()
@@ -236,7 +239,7 @@ func TestRotateOver30Files(t *testing.T) {
 		os.Chtimes(filepath.Join(logDir, "info.log"), psudoDate, psudoDate)
 	}
 
-	// check backup directory has 30 files
+	// check rotate directory has 30 files
 	files, err := os.ReadDir(rotateLogDir)
 	if err != nil {
 		t.Errorf("Rotate() = %v", err)
@@ -245,7 +248,7 @@ func TestRotateOver30Files(t *testing.T) {
 		t.Errorf("Rotate() = %v", files)
 	}
 
-	// chmod to read only to backup directory
+	// chmod to read only to rotate directory
 	err = os.Chmod(rotateLogDir, 0400)
 	if err != nil {
 		t.Errorf("Rotate() = %v", err)

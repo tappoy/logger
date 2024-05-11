@@ -12,9 +12,9 @@
 //
 // Log rotation. The log files are rotated when date changes.
 //
-//	ex) error.log -> backup/error_2024-04-09.log
+//	ex) error.log -> rotate/2024-04-09.error.log
 //
-// If there is over 30 files in backup directory, the oldest file is deleted.
+// If there is over 30 files in rotate directory, the oldest file is deleted.
 //
 // Output logs in LTSV format.
 //
@@ -109,21 +109,21 @@ func (logger *Logger) rotate(logFilePath string, now time.Time, level string) er
 	modTime := stat.ModTime()
 
 	if modTime.Day() != now.Day() {
-		// create backup directory if not exists
-		if _, err := os.Stat(filepath.Join(logger.logDir, "backup")); err != nil {
-			err := os.MkdirAll(filepath.Join(logger.logDir, "backup"), 0775)
+		// create rotate directory if not exists
+		if _, err := os.Stat(filepath.Join(logger.logDir, "rotate")); err != nil {
+			err := os.MkdirAll(filepath.Join(logger.logDir, "rotate"), 0775)
 			if err != nil {
 				return err
 			}
 		}
 
-		// remove old backup files
-		list, err := filepath.Glob(filepath.Join(logger.logDir, "backup", "*"))
+		// remove old rotate files
+		list, err := filepath.Glob(filepath.Join(logger.logDir, "rotate", "*"))
 		if err != nil {
 			return err
 		}
 
-		// check if backup files count is over 30
+		// check if rotate files count is over 30
 		if len(list) > 30 {
 			// sort by modified time
 			for i := 0; i < len(list); i++ {
@@ -135,15 +135,15 @@ func (logger *Logger) rotate(logFilePath string, now time.Time, level string) er
 					}
 				}
 			}
-			// remove old backup files over 30
+			// remove old rotate files over 30
 			for i := 29; i < len(list); i++ {
 				os.Remove(list[i])
 			}
 		}
 
 		// make rote file name
-		rotateFileName := level + "_" + modTime.Format("2006-01-02") + ".log"
-		rotateFilePath := filepath.Join(logger.logDir, "backup", rotateFileName)
+		rotateFileName := modTime.Format("2006-01-02") + "." + level + ".log"
+		rotateFilePath := filepath.Join(logger.logDir, "rotate", rotateFileName)
 		// check if rotate file exists
 		if _, err := os.Stat(rotateFilePath); err != nil {
 			// if not exists, rename log file to rotate file

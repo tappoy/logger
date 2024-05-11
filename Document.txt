@@ -19,9 +19,9 @@ is turned off.
 
 Log rotation. The log files are rotated when date changes.
 
-    ex) error.log -> backup/error_2024-04-09.log
+    ex) error.log -> rotate/2024-04-09.error.log
 
-If there is over 30 files in backup directory, the oldest file is deleted.
+If there is over 30 files in rotate directory, the oldest file is deleted.
 
 Output logs in LTSV format.
 
